@@ -22,7 +22,7 @@ stats.showRecents = async (message, params) => {
     vars.playerId.forEach(player => {
         let url = vars.playerUrl + player[1];
         // for(let m = 0; m < number; m++)
-            getRecents(player[0], url + '/recentMatches', message);
+        getRecents(player[0], url + '/recentMatches', message);
     });
 };
 
@@ -54,7 +54,7 @@ const getRecents = async (name, url, message) => {
     try {
         const res = await fetch(url);
         const matches = await res.json();
-        let output = name + "\'s latest match "  + ", kills: " + matches[0]['kills'] + ", deaths: " + matches[0]['deaths'] + ", and assists: "
+        let output = name + "\'s latest match " + ", kills: " + matches[0]['kills'] + ", deaths: " + matches[0]['deaths'] + ", and assists: "
             + matches[0]['assists'] + ".";
         console.log(output);
         message.channel.send(output);
