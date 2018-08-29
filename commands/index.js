@@ -6,10 +6,23 @@ var stats = {};
 
 
 //Actual call methods in bot.js
-stats.showMedal = async(message) =>{
-    vars.playerId.forEach( player => {
+stats.showMedal = async (message) => {
+    vars.playerId.forEach(player => {
         let newUrl = vars.playerUrl + player[1];
         getMedal(player[0], newUrl, message);
+    });
+};
+
+stats.showRecents = async (message, params) => {
+    // params = params.replace("recents", "").trim();
+    // let number = parseInt(params);
+    // if(params == NaN || params > 5){
+    //     return message.channel.send("Try again!");
+    // }
+    vars.playerId.forEach(player => {
+        let url = vars.playerUrl + player[1];
+        // for(let m = 0; m < number; m++)
+            getRecents(player[0], url + '/recentMatches', message);
     });
 };
 
@@ -37,4 +50,18 @@ const getMedal = async (name, url, message) => {
     }
 };
 
+const getRecents = async (name, url, message) => {
+    try {
+        const res = await fetch(url);
+        const matches = await res.json();
+        let output = name + "\'s latest match "  + ", kills: " + matches[0]['kills'] + ", deaths: " + matches[0]['deaths'] + ", and assists: "
+            + matches[0]['assists'] + ".";
+        console.log(output);
+        message.channel.send(output);
+    }
+    catch (er) {
+        console.error(er);
+
+    }
+};
 module.exports = stats;

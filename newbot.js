@@ -27,10 +27,9 @@ client.on('message', message => {
             case "medal":
                 stats.showMedal(message);
                 break;
-            case "recents":
-                stats.showRecents(message, msg);
-                break;
-            default: message.reply("What are you trying to do?");
+
+            
+            default: message.reply("What are you trying to do?!");
         }
     }
 });
