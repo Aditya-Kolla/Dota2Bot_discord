@@ -1,0 +1,15 @@
+{
+    "prefix"   : "!",
+    "playerId" : [["Aditya", 260697444], ["Rohan", 92171265], ["Tanuj", 166306408]],
+    "playerUrl": "https://api.opendota.com/api/players/",
+    "medals"   : [
+        "Herald",
+        "Guardian",
+        "Crusader",
+        "Archon",
+        "Legend",
+        "Ancient",
+        "Divine",
+        "Immortal"   
+    ]
+}
