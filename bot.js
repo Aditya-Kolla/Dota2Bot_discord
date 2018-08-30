@@ -19,6 +19,8 @@ client.on('message', message => {
     let msg = message.content;
     if (msg.startsWith(vars.prefix)) {
         msg = msg.substring(1);
+        if(msg.startsWith("me"))
+            stats.initializeUserProfile(message);
         switch (msg) {
             case "ping":
                 message.reply("PONG");
@@ -27,9 +29,13 @@ client.on('message', message => {
             case "medal":
                 stats.showMedal(message);
                 break;
-            case "recents":
-                stats.showRecents(message, msg);
+            case "RECENTS":
+                stats.showRecentsGlobal(message);
                 break;
+            case "recents":
+                stats.showRecents(message);
+                break;
+
             default: message.reply("What are you trying to do?");
         }
     }

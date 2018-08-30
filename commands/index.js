@@ -1,4 +1,7 @@
 const fetch = require('node-fetch');
+const Database = require('nedb');
+let db = new Database({filename: "./playerProfiles.json", autoload: true});
+
 
 const vars = require("../app_variables.json");
 
@@ -13,7 +16,7 @@ stats.showMedal = async (message) => {
     });
 };
 
-stats.showRecents = async (message, params) => {
+stats.showRecentsGlobal = async (message) => {
     // params = params.replace("recents", "").trim();
     // let number = parseInt(params);
     // if(params == NaN || params > 5){
@@ -26,6 +29,30 @@ stats.showRecents = async (message, params) => {
     });
 };
 
+stats.showRecents = async(message) => {
+    let player = message.author.id;
+    try{
+        console.log("Fetching the latest match of user: " + player);
+        await _showRecents(player, message);
+    }
+    catch(er){
+        console.error(er);
+        
+    }
+};
+
+stats.initializeUserProfile = async(message) =>{
+    let player = message.author.id;
+    try{
+        let userID = message.content.replace("!me", "").trim();
+        console.log(userID);
+        await _initiliazeUserProfile(player, userID, message);
+    }
+    catch(er){
+        console.error(er);
+        
+    }
+};
 
 
 
@@ -64,4 +91,47 @@ const getRecents = async (name, url, message) => {
 
     }
 };
+
+const _initiliazeUserProfile = async(player, userID, message) => {
+    try{
+        db.find({DiscordID : player}, (error, result) => {
+            if(result.length != 0)
+                return message.reply("The user profile already exists!");
+            else{
+                db.insert({DiscordID : player, Dota2: userID});
+                return message.reply("Your user profile has been set!");
+            }
+        });
+    }
+    catch(er){
+        console.error(er);
+    }
+};
+
+const _showRecents = async(player, message) => {
+    try{
+        db.find({DiscordID : player}, async (error, result) => {
+            if(result.length == 0 )
+                return message.reply("You have no user profile!");
+            else{
+                let playerID = result[0]['Dota2'];
+                try{
+                    const res = await fetch(vars.playerUrl + `${playerID}/recentMatches`);
+                    const matches = await res.json();
+                    let output = `your latest match, kills : ${matches[0]['kills']}, deaths : ${matches[0]['deaths']}, and assists : ${matches[0]['assists']}.`;
+                    await message.reply(output);
+                }
+                catch(er){
+                    console.error(er);
+                    await message.reply("Ooops bot broke!");
+                }
+            }
+        });
+    }
+    catch(er){
+        console.error(er);
+        
+    }
+};
+
 module.exports = stats;
