@@ -19,21 +19,32 @@ client.on('message', message => {
     let msg = message.content;
     if (msg.startsWith(vars.prefix)) {
         msg = msg.substring(1);
-        if(msg.startsWith("me"))
-            stats.initializeUserProfile(message);
-        switch (msg) {
+        msg = msg.split(/\s+/);
+        console.log(msg);
+        // if(msg.startsWith("me"))
+        //     stats.initializeUserProfile(message);
+        switch (msg[0]) {
+            case "me":
+                stats.setUserProfile(message, msg)
+                break;
             case "ping":
                 message.reply("PONG");
                 break;
 
+            case "MEDAL":
+                stats.showMedalGlobal(message)
+                break;
+
             case "medal":
-                stats.showMedal(message);
+                stats.showMedalPersonal(message);
                 break;
-            case "RECENTS":
-                stats.showRecentsGlobal(message);
+
+            case "KDA":
+                stats.showKdaGlobal(message);
                 break;
-            case "recents":
-                stats.showRecents(message);
+
+            case "kda":
+                stats.showKdaPersonal(message);
                 break;
 
             default: message.reply("What are you trying to do?");
