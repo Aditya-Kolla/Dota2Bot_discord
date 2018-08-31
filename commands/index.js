@@ -41,10 +41,9 @@ stats.showRecents = async(message) => {
     }
 };
 
-stats.initializeUserProfile = async(message) =>{
+stats.initializeUserProfile = async(message, userID) =>{
     let player = message.author.id;
     try{
-        let userID = message.content.replace("!me", "").trim();
         console.log(userID);
         await _initiliazeUserProfile(player, userID, message);
     }
@@ -54,7 +53,17 @@ stats.initializeUserProfile = async(message) =>{
     }
 };
 
-
+stats.removeProfile = async(message) => {
+    let player = message.author.id;
+    try{
+        console.log("Removing player: " + player);
+        await _removeProfile(message, player);
+    }
+    catch(error){
+        console.error(error);
+        
+    }
+};
 
 
 
@@ -130,6 +139,20 @@ const _showRecents = async(player, message) => {
     }
     catch(er){
         console.error(er);
+        
+    }
+};
+
+const _removeProfile = async(message, player) => {
+    try{
+        db.remove({DiscordID : player}, {}, async(error, numRemoved) => {
+            if(numRemoved == 1)
+                message.reply(", your profile has been successfully removed!");
+        });
+    }
+    catch(error){
+        console.error(error);
+        await message.reply(", are you drunk?");
         
     }
 };
