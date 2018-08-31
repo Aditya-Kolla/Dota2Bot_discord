@@ -58,7 +58,8 @@ stats.showMedalPersonal = async (message) => {
 };
 
 stats.showKdaPersonal = async(message) => {
-    db.find({}, (error, players) => {
+    let author = message.author.id;
+    db.find({DiscordID: author}, (error, players) => {
         if (error)
             console.log(error);
         if (players.length > 0) {
