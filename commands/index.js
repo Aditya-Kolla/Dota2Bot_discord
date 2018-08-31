@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const Database = require('nedb');
-let db = new Database({filename: "./playerProfiles.json", autoload: true});
+let db = new Database({ filename: "./playerProfiles.json", autoload: true });
 
 
 const vars = require("../app_variables.json");
@@ -9,61 +9,119 @@ var stats = {};
 
 
 //Actual call methods in bot.js
-stats.showMedal = async (message) => {
-    vars.playerId.forEach(player => {
-        let newUrl = vars.playerUrl + player[1];
-        getMedal(player[0], newUrl, message);
+//Global Functions
+stats.showMedalGlobal = async (message) => {
+    db.find({}, (error, players) => {
+        if (error)
+            console.log(error);
+        if (players.length > 0) {
+            players.forEach(player => {
+                let url = vars.playerUrl + player["Dota2"];
+                _getMedal(player["Name"], url, message);
+            });
+        } else {
+            message.channel.send("Register player profiles first");
+        }
     });
 };
 
-stats.showRecentsGlobal = async (message) => {
-    // params = params.replace("recents", "").trim();
-    // let number = parseInt(params);
-    // if(params == NaN || params > 5){
-    //     return message.channel.send("Try again!");
-    // }
-    vars.playerId.forEach(player => {
-        let url = vars.playerUrl + player[1];
-        // for(let m = 0; m < number; m++)
-        getRecents(player[0], url + '/recentMatches', message);
+stats.showKdaGlobal = async (message) => {
+    db.find({}, (error, players) => {
+        if (error)
+            console.log(error);
+        if (players.length > 0) {
+            players.forEach(player => {
+                let url = vars.playerUrl + player["Dota2"] + '/recentMatches';
+                _getKda(player["Name"], url, message);
+            });
+        } else {
+            message.channel.send("Register player profiles first");
+        }
     });
 };
 
-stats.showRecents = async(message) => {
+
+//Personal functions
+stats.showMedalPersonal = async (message) => {
+    let author = message.author.id;
+    db.find({ DiscordID: author }, (error, players) => {
+        if (error) console.log(error);
+        if (players.length > 0) {
+            players.forEach(player => {
+                let newUrl = vars.playerUrl + player["Dota2"];
+                _getMedal(player["Name"], newUrl, message);
+            });
+        } else {
+            message.reply("You have no user profile! Register player profile");
+        }
+    });
+};
+
+stats.showKdaPersonal = async (message) => {
+    let author = message.author.id;
+    db.find({ DiscordID: author }, (error, players) => {
+        if (error)
+            console.log(error);
+        if (players.length > 0) {
+            players.forEach(player => {
+                let url = vars.playerUrl + player["Dota2"] + '/recentMatches';
+                _getKda(player["Name"], url, message);
+            });
+        } else {
+            message.channel.send("Register player profiles first");
+        }
+    });
+};
+
+stats.showWinLoss = async (message) => {
+    let player = {};
+    if (message.content === '!wl')
+        player.DiscordID = message.author.id;
+    console.log(player);
+    db.find(player, (error, players) => {
+        console.log(players);
+        if (error)
+            console.log(error);
+        if (players.length == 1) {
+            let url = vars.playerUrl + players[0]['Dota2'] + '/wl';
+            _showWinLoss(players[0]['Name'], url, message);
+        }
+        else if (players.length > 1) {
+            players.forEach(player => {
+                let url = vars.playerUrl + player['Dota2'] + '/wl';
+                _showWinLoss(player['Name'], url, message)
+            });
+        }
+        else {
+            message.channel.send('Register player profiles first');
+        }
+    });
+
+}
+stats.setUserProfile = async (message, msg) => {
     let player = message.author.id;
-    try{
-        console.log("Fetching the latest match of user: " + player);
-        await _showRecents(player, message);
+    try {
+        let name = msg[1];
+        let userID = msg[2];
+        console.log(msg);
+        await _setUserProfile(player, name, userID, message);
     }
-    catch(er){
-        console.error(er);
-        
+    catch (err) {
+        console.error(err);
+
     }
 };
 
-stats.initializeUserProfile = async(message, userID) =>{
-    let player = message.author.id;
-    try{
-        console.log(userID);
-        await _initiliazeUserProfile(player, userID, message);
-    }
-    catch(er){
-        console.error(er);
-        
-    }
+stats.playerBattle = async (message, msg) => {
+    let [, playerA, , playerB] = msg;
+    console.log(playerA + " VS " + playerB);
 };
 
-stats.removeProfile = async(message) => {
-    let player = message.author.id;
-    try{
-        console.log("Removing player: " + player);
-        await _removeProfile(message, player);
-    }
-    catch(error){
-        console.error(error);
-        
-    }
-};
+stats.removeUserProfile = async (message) => {
+    let user = message.author.id;
+    _removeUserProfile(message, user);
+}
+
 
 
 
@@ -72,7 +130,7 @@ stats.removeProfile = async(message) => {
 
 // Helper functions
 //Never call them directly in bot.js
-const getMedal = async (name, url, message) => {
+const _getMedal = async (name, url, message) => {
     try {
         const res = await fetch(url);
         const json = await res.json();
@@ -86,7 +144,7 @@ const getMedal = async (name, url, message) => {
     }
 };
 
-const getRecents = async (name, url, message) => {
+const _getKda = async (name, url, message) => {
     try {
         const res = await fetch(url);
         const matches = await res.json();
@@ -95,65 +153,83 @@ const getRecents = async (name, url, message) => {
         console.log(output);
         message.channel.send(output);
     }
-    catch (er) {
-        console.error(er);
-
+    catch (err) {
+        console.error(err);
     }
 };
 
-const _initiliazeUserProfile = async(player, userID, message) => {
-    try{
-        db.find({DiscordID : player}, (error, result) => {
-            if(result.length != 0)
-                return message.reply("The user profile already exists!");
-            else{
-                db.insert({DiscordID : player, Dota2: userID});
-                return message.reply("Your user profile has been set!");
-            }
-        });
+const _showWinLoss = async (name, url, message) => {
+    try {
+        const res = await fetch(url);
+        const wl = await res.json();
+        const { win, lose } = wl;
+        let output = `${name} has won ${win} matches and has lost ${lose} matches for a Win % of ${(win / (win + lose) * 100).toFixed(2)}.`;
+        console.log(output);
+        message.channel.send(output);
     }
-    catch(er){
-        console.error(er);
-    }
-};
-
-const _showRecents = async(player, message) => {
-    try{
-        db.find({DiscordID : player}, async (error, result) => {
-            if(result.length == 0 )
-                return message.reply("You have no user profile!");
-            else{
-                let playerID = result[0]['Dota2'];
-                try{
-                    const res = await fetch(vars.playerUrl + `${playerID}/recentMatches`);
-                    const matches = await res.json();
-                    let output = `your latest match, kills : ${matches[0]['kills']}, deaths : ${matches[0]['deaths']}, and assists : ${matches[0]['assists']}.`;
-                    await message.reply(output);
-                }
-                catch(er){
-                    console.error(er);
-                    await message.reply("Ooops bot broke!");
-                }
-            }
-        });
-    }
-    catch(er){
-        console.error(er);
-        
-    }
-};
-
-const _removeProfile = async(message, player) => {
-    try{
-        db.remove({DiscordID : player}, {}, async(error, numRemoved) => {
-            if(numRemoved == 1)
-                message.reply(", your profile has been successfully removed!");
-        });
-    }
-    catch(error){
+    catch (error) {
         console.error(error);
-        await message.reply(", are you drunk?");
-        
+
+    }
+};
+
+
+// const _showRecents = async (player, message) => {
+//     try{
+//         db.find({DiscordID : player}, async (error, result) => {
+//             if(error) 
+//                 console.log(error);
+//             if(result.length == 0 )
+//                 return message.reply("You have no user profile!");
+//             else{
+//                 let playerID = result[0]['Dota2'];
+//                 try{
+//                     const res = await fetch(vars.playerUrl + `${playerID}/recentMatches`);
+//                     const matches = await res.json();
+//                     let output = `your latest match, kills : ${matches[0]['kills']}, deaths : ${matches[0]['deaths']}, and assists : ${matches[0]['assists']}.`;
+//                     message.reply(output);
+//                 }
+//                 catch(err){
+//                     console.error(err);
+//                     await message.reply("Ooops bot broke!");
+//                 }
+//             }
+//         });
+//     }
+//     catch(err){
+//         console.error(err);   
+//     }
+// };
+
+const _setUserProfile = async (player, name, userID, message) => {
+    try {
+        db.find({ DiscordID: player }, (error, players) => {
+            if (error)
+                console.log(error);
+            if (players.length > 0)
+                return message.reply("The user profile already exists!");
+            else {
+                db.insert({ Name: name, DiscordID: player, Dota2: userID });
+                return message.reply('Your user profile has been set');
+            }
+        });
+    }
+    catch (err) {
+        console.error(err);
+    }
+};
+
+const _removeUserProfile = async (message, user) => {
+    try {
+        db.remove({ DiscordID: user }, (error, numRemoved) => {
+            if (error)
+                console.log(error);
+            else
+                message.reply(", your profile has been successfully deleted!")
+        });
+    }
+    catch (error) {
+        console.error(error);
     }
 };
 
