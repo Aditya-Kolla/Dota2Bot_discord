@@ -21,11 +21,13 @@ client.on('message', message => {
         msg = msg.substring(1);
         msg = msg.split(/\s+/);
         console.log(msg);
-        // if(msg.startsWith("me"))
-        //     stats.initializeUserProfile(message);
         switch (msg[0]) {
             case "me":
                 stats.setUserProfile(message, msg)
+                break;
+
+            case "remove":
+                stats.removeUserProfile(message);
                 break;
             case "ping":
                 message.reply("PONG");
@@ -47,6 +49,17 @@ client.on('message', message => {
                 stats.showKdaPersonal(message);
                 break;
 
+            case "wl":
+                stats.showWinLoss(message);
+                break;
+
+            case "WL":
+                stats.showWinLoss(message);
+                break;
+            
+            case "1v1":
+                stats.playerBattle(message, msg);
+                break;
             default: message.reply("What are you trying to do?");
         }
     }
