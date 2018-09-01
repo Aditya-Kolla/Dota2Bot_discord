@@ -6,7 +6,7 @@ The bot is built using the [discord.js](https://discord.js.org) module.
 
 Prefix the command name with '!' to use it.
 
-**COMMAND LIST**
+**COMMAND LIST** <br />
 **__me__**      - This command is used to setup your name and opendota ID with our                          database. It takes two arguments- name and the opendota ID.
 
 **__ping__**    - Try this command for fun.

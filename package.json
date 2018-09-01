@@ -4,12 +4,25 @@
   "description": "A discord bot for our Dota 2 discord server",
   "main": "bot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bot.js"
   },
-  "author": [
-    "Aditya Kolla",
-    "Rohan"
+  "engines": {
+    "node" : "8.x",
+    "npm" : "*"
+  },
+  "author":"Aditya Kolla",
+  "contributors": [
+    "Rohan Ankarigari"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aditya-Kolla/Dota2Bot_discord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Aditya-Kolla/Dota2Bot_discord/issues"
+  },
+  "homepage": "https://github.com/Aditya-Kolla/Dota2Bot_discord#readme.md",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.4.2",
