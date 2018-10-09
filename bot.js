@@ -10,6 +10,8 @@ const vars = require("./app_variables.json");
 //All the method calls
 const stats = require('./commands/index');
 
+// Help command
+const help = require('./help/index');
 
 client.on("ready", _ => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -29,6 +31,7 @@ client.on('message', message => {
             case "remove":
                 stats.removeUserProfile(message);
                 break;
+                
             case "ping":
                 message.reply("PONG");
                 break;
@@ -60,6 +63,11 @@ client.on('message', message => {
             case "1v1":
                 stats.playerBattle(message, msg);
                 break;
+
+            case "help":
+                help.show(message);
+                break;    
+
             default: message.reply("What are you trying to do?");
         }
     }
