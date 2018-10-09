@@ -9,6 +9,8 @@ Prefix the command name with '!' to use it.
 **COMMAND LIST** <br />
 **__me__**      - This command is used to setup your name and opendota ID with our                          database. It takes two arguments- name and the opendota ID.
 
+**__remove__**   - This command removes your profile from our database. It takes no argument.
+
 **__ping__**    - Try this command for fun.
 
 **__medal__**   - This command prints your medal rating
@@ -24,5 +26,7 @@ Prefix the command name with '!' to use it.
 **__WL__**      - This is a global command. It is used to fetch the win rate of all                         registered users.
 
 **__1v1__**     - This command takes two arguments- names of two registered users and                       puts them against each other. Calculating lifetime and recent games                      stats to declare one player as the winner.
+
+**__help__**     - This command displays all commands available with some explanations for each one.
 
 *More to come*
