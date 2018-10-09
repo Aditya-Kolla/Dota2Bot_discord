@@ -140,6 +140,10 @@ stats.removeUserProfile = async (message) => {
     _removeUserProfile(message, user);
 }
 
+stats.helpMessage = async (message) => {
+    _showHelpMessage(message);
+}
+
 
 
 
@@ -320,6 +324,28 @@ const _removeUserProfile = async (message, user) => {
     }
     catch (error) {
         console.error(error);
+    }
+};
+
+const _showHelpMessage = async (message) => {
+    try{
+        const helpMessage = "You can use these commands in the Dota2 discord bot:" + "\n";
+        helpMessage += "!me -- This command is used to setup your name and opendota ID with our database. It takes two arguments- name and the opendota ID." + "\n" +
+                       "!remove -- Remove user profile" + "\n" +
+                       "!ping -- Try this command for fun!" + "\n" +
+                       "!MEDAL -- This is a global command. It is used to fetch the medal ratings of all players in DB." + "\n" +
+                       "!medal -- This command prints your medal rating." + "\n" +
+                       "!KDA -- This is a global command. It is used to fetch the last game's KDA of all registered players." + "\n" +
+                       "!kda -- This command fetches your last game's Kill Death Assists." + "\n" +
+                       "!wl -- This command fetches your overall win and loss percentage." + "\n" +
+                       "!WL -- This is a global command. It is used to fetch the win rate of all registered users." + "\n" +
+                       "!1v1 -- This command takes two arguments- names of two registered users and puts them against each other. Calculating lifetime and recent games stats to declare one player as the winner." + "\n" +
+                       "!help -- Show this help message";
+
+        message.reply(helpMessage);
+    }
+    catch (err) {
+        console.error(err);
     }
 };
 
