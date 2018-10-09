@@ -60,6 +60,11 @@ client.on('message', message => {
             case "1v1":
                 stats.playerBattle(message, msg);
                 break;
+
+            case "help":
+                stats.helpMessage(message);
+                break;
+
             default: message.reply("What are you trying to do?");
         }
     }

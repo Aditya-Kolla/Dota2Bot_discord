@@ -25,4 +25,6 @@ Prefix the command name with '!' to use it.
 
 **__1v1__**     - This command takes two arguments- names of two registered users and                       puts them against each other. Calculating lifetime and recent games                      stats to declare one player as the winner.
 
+**__help__**    - Show help message.
+
 *More to come*
