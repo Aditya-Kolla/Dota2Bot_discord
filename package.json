@@ -8,10 +8,10 @@
     "start": "node bot.js"
   },
   "engines": {
-    "node" : "8.x",
-    "npm" : "*"
+    "node": "8.x",
+    "npm": "*"
   },
-  "author":"Aditya Kolla",
+  "author": "Aditya Kolla",
   "contributors": [
     "Rohan Ankarigari"
   ],
@@ -26,6 +26,7 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.4.2",
+    "dotenv": "^6.1.0",
     "nedb": "^1.8.0",
     "node-fetch": "^2.2.0"
   }

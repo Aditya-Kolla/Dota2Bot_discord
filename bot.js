@@ -1,8 +1,9 @@
 //BOT REQUIRES
+require('dotenv').config()
 const Discord = require('discord.js'),
-    fetch = require('node-fetch');
-client = new Discord.Client(),
-    auth = require('./auth.json');
+    fetch = require('node-fetch')
+    client = new Discord.Client();
+
 
 //CONFIG 
 const vars = require("./app_variables.json");
@@ -73,5 +74,5 @@ client.on('message', message => {
     }
 });
 
-client.login(auth.token);
+client.login(process.env.token);
 
