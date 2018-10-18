@@ -2,6 +2,7 @@ var help = {};
 
 help.show = (message) => {
     const outputs = [];
+    outputs.push("\n");
     outputs.push("!me     - This command is used to setup your name and opendota ID with our database. It takes two arguments- name and the opendota ID.");
     outputs.push("!remove - This command removes your profile from our database. It takes no argument.");
     outputs.push("!ping   - Try this command for fun.");
