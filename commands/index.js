@@ -113,25 +113,45 @@ stats.setUserProfile = async (message, msg) => {
 };
 
 stats.playerBattle = async (message, msg) => {
-    let [, playerA, , playerB] = msg;
-    try{
+    console.log(msg);
+    try {
         let pA = '';
         let pB = '';
-        db.find({$or:[{Name: playerA}, {Name: playerB}]}, async(error, players) => {
-            if(players.length != 2)
-                return message.reply("The requested player profiles do not exist!");
-            players.forEach(player => {
-                if(playerA == player['Name'])
-                    pA = player['Dota2'];
-                if(playerB == player['Name'])
-                    pB = player['Dota2'];
-            });
-            await _playerBattle(message, pA, pB, playerA, playerB);
-        });
+        if (msg.length < 3) {
+            db.find({ $or: [{ Name: msg[1] }, { DiscordID: message.author.id }] }, async (error, players) => {
+                let me = '';
+                if (players.length != 2)
+                    return message.reply("The requested player profiles do not exist!");
+                players.forEach(player => {
+                    if (player['DiscordID'] == message.author.id) {
+                        pA = player['Dota2'];
+                        me = player['Name'];
+                    }
+                    else
+                        pB = player['Dota2'];
+                });
+                if (pb != '')
+                    await _playerBattle(message, pA, pB, me, msg[1]);
+                else
+                    message.reply.send("https://www.goiowaawesome.com/sites/default/files/styles/904x490/public/c/2017/09/1983_h.jpg?itok=0097jRvB");
+            }).catch(console.error);
+        }
+        else {
+            db.find({ $or: [{ Name: playerA }, { Name: playerB }] }, async (error, players) => {
+                if (players.length != 2)
+                    return message.reply("The requested player profiles do not exist!");
+                players.forEach(player => {
+                    if (playerA == player['Name'])
+                        pA = player['Dota2'];
+                    if (playerB == player['Name'])
+                        pB = player['Dota2'];
+                });
+                await _playerBattle(message, pA, pB, playerA, playerB);
+            }).catch(console.error);
+        }
     }
-    catch(error){
+    catch (error) {
         console.error(error);
-        
     }
 };
 
@@ -192,7 +212,7 @@ const _showWinLoss = async (name, url, message) => {
 };
 
 const _playerBattle = async (message, playerA, playerB, nameA, nameB) => {
-    try{
+    try {
         let urlA = vars.playerUrl + playerA;
         let urlB = vars.playerUrl + playerB;
         let mmrA = await fetch(urlA);
@@ -202,18 +222,18 @@ const _playerBattle = async (message, playerA, playerB, nameA, nameB) => {
         mmrB = await mmrB.json()
         mmrB = mmrB['mmr_estimate']['estimate'];
         let tA = await fetch(urlA + '/wl');
-        let {win: wA, lose: lA} = await tA.json();
+        let { win: wA, lose: lA } = await tA.json();
         let tB = await fetch(urlB + '/wl')
-        let{win: wB, lose: lB} = await tB.json();
+        let { win: wB, lose: lB } = await tB.json();
         let recents = await fetch(urlA + '/recentMatches')
         recents = await recents.json();
-        let statsA = {kills : 0, deaths : 0, assists: 0, mmr : mmrA, wins: wA, losses: lA};
+        let statsA = { kills: 0, deaths: 0, assists: 0, mmr: mmrA, wins: wA, losses: lA };
         recents.forEach(match => {
             statsA.kills += match['kills'];
             statsA.deaths += match['deaths'];
             statsA.assists += match['assists'];
         });
-        let statsB = {kills : 0, deaths : 0, assists : 0, mmr: mmrB, wins : wB, losses : lB};
+        let statsB = { kills: 0, deaths: 0, assists: 0, mmr: mmrB, wins: wB, losses: lB };
         recents = await fetch(urlB + '/recentMatches')
         recents = await recents.json();
         recents.forEach(match => {
@@ -226,41 +246,41 @@ const _playerBattle = async (message, playerA, playerB, nameA, nameB) => {
         let sB = 0;
         Object.keys(statsA).forEach(stat => {
             let s = statsA[stat] - statsB[stat];
-            if(s > 0){
-                if(stat=='deaths' || stat=='losses'){
+            if (s > 0) {
+                if (stat == 'deaths' || stat == 'losses') {
                     output += `${nameB} has less ${stat} than ${nameA} with ${statsB[stat]}: ${nameB}\n`;
                     sB++;
                 }
-                else{
+                else {
                     output += `${nameA} has more ${stat} than ${nameB} with ${statsA[stat]}: ${nameA}\n`;
                     sA++;
                 }
             }
-            else if(s == 0){
+            else if (s == 0) {
                 output += `${nameA} and ${nameB} have the same ${stat}: DRAW\n`;
             }
-            else{
-                if(stat=='deaths' || stat=='losses'){
+            else {
+                if (stat == 'deaths' || stat == 'losses') {
                     output += `${nameA} has less ${stat} than ${nameB} with ${statsA[stat]}: ${nameA}\n`;
                     sA++;
                 }
-                else{
+                else {
                     output += `${nameB} has more ${stat} than ${nameA} with ${statsB[stat]}: ${nameB}\n`;
                     sB++;
                 }
             }
         });
-        if(sA > sB)
+        if (sA > sB)
             output += `${nameA} wins the duel!`;
-        else if(sB > sA)
+        else if (sB > sA)
             output += `${nameB} wins the duel!`;
         else
             output += `It's a draw!`;
         message.channel.send(output);
     }
-    catch(error){
+    catch (error) {
         console.error(error);
-        
+
     }
 };
 
