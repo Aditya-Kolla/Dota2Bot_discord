@@ -1,8 +1,9 @@
 //BOT REQUIRES
 require('dotenv').config()
-const Discord = require('discord.js'),
-    fetch = require('node-fetch')
-    client = new Discord.Client();
+const Discord   = require('discord.js');
+    // fetch = require('node-fetch');
+// const axios     = require('axios');
+const client    = new Discord.Client();
 
 
 //CONFIG 
@@ -62,7 +63,7 @@ client.on('message', message => {
                 break;
             
             case "1v1":
-                stats.playerBattle(message, msg);
+                message.reply("Hold on there fella, still work in progress.");
                 break;
 
             case "help":
