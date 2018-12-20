@@ -1,6 +1,9 @@
 const fetch = require('node-fetch');
 const Database = require('nedb');
-let db = new Database({ filename: "./playerProfiles.json", autoload: true });
+let db = new Database({
+    filename: "./playerProfiles.json",
+    autoload: true
+});
 
 
 const vars = require("../app_variables.json");
@@ -44,7 +47,9 @@ stats.showKdaGlobal = async (message) => {
 //Personal functions
 stats.showMedalPersonal = async (message) => {
     let author = message.author.id;
-    db.find({ DiscordID: author }, (error, players) => {
+    db.find({
+        DiscordID: author
+    }, (error, players) => {
         if (error) console.log(error);
         if (players.length > 0) {
             players.forEach(player => {
@@ -59,7 +64,9 @@ stats.showMedalPersonal = async (message) => {
 
 stats.showKdaPersonal = async (message) => {
     let author = message.author.id;
-    db.find({ DiscordID: author }, (error, players) => {
+    db.find({
+        DiscordID: author
+    }, (error, players) => {
         if (error)
             console.log(error);
         if (players.length > 0) {
@@ -85,14 +92,12 @@ stats.showWinLoss = async (message) => {
         if (players.length == 1) {
             let url = vars.playerUrl + players[0]['Dota2'] + '/wl';
             _showWinLoss(players[0]['Name'], url, message);
-        }
-        else if (players.length > 1) {
+        } else if (players.length > 1) {
             players.forEach(player => {
                 let url = vars.playerUrl + player['Dota2'] + '/wl';
                 _showWinLoss(player['Name'], url, message)
             });
-        }
-        else {
+        } else {
             message.channel.send('Register player profiles first');
         }
     });
@@ -100,15 +105,15 @@ stats.showWinLoss = async (message) => {
 }
 stats.setUserProfile = async (message, msg) => {
     let player = message.author.id;
+    if(message.author.bot)
+        return;
     try {
         let name = msg[1];
         let userID = msg[2];
         console.log(msg);
         await _setUserProfile(player, name, userID, message);
-    }
-    catch (err) {
+    } catch (err) {
         console.error(err);
-
     }
 };
 
@@ -118,7 +123,13 @@ stats.playerBattle = async (message, msg) => {
         let pA = '';
         let pB = '';
         if (msg.length < 3) {
-            db.find({ $or: [{ Name: msg[1] }, { DiscordID: message.author.id }] }, async (error, players) => {
+            db.find({
+                $or: [{
+                    Name: msg[1]
+                }, {
+                    DiscordID: message.author.id
+                }]
+            }, async (error, players) => {
                 let me = '';
                 if (players.length != 2)
                     return message.reply("The requested player profiles do not exist!");
@@ -126,8 +137,7 @@ stats.playerBattle = async (message, msg) => {
                     if (player['DiscordID'] == message.author.id) {
                         pA = player['Dota2'];
                         me = player['Name'];
-                    }
-                    else
+                    } else
                         pB = player['Dota2'];
                 });
                 if (pb != '')
@@ -135,9 +145,14 @@ stats.playerBattle = async (message, msg) => {
                 else
                     message.reply.send("https://www.goiowaawesome.com/sites/default/files/styles/904x490/public/c/2017/09/1983_h.jpg?itok=0097jRvB");
             }).catch(console.error);
-        }
-        else {
-            db.find({ $or: [{ Name: playerA }, { Name: playerB }] }, async (error, players) => {
+        } else {
+            db.find({
+                $or: [{
+                    Name: playerA
+                }, {
+                    Name: playerB
+                }]
+            }, async (error, players) => {
                 if (players.length != 2)
                     return message.reply("The requested player profiles do not exist!");
                 players.forEach(player => {
@@ -149,8 +164,7 @@ stats.playerBattle = async (message, msg) => {
                 await _playerBattle(message, pA, pB, playerA, playerB);
             }).catch(console.error);
         }
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 };
@@ -186,12 +200,11 @@ const _getKda = async (name, url, message) => {
     try {
         const res = await fetch(url);
         const matches = await res.json();
-        let output = name + "\'s latest match " + ", kills: " + matches[0]['kills'] + ", deaths: " + matches[0]['deaths'] + ", and assists: "
-            + matches[0]['assists'] + ".";
+        let output = name + "\'s latest match " + ", kills: " + matches[0]['kills'] + ", deaths: " + matches[0]['deaths'] + ", and assists: " +
+            matches[0]['assists'] + ".";
         console.log(output);
         message.channel.send(output);
-    }
-    catch (err) {
+    } catch (err) {
         console.error(err);
     }
 };
@@ -200,12 +213,14 @@ const _showWinLoss = async (name, url, message) => {
     try {
         const res = await fetch(url);
         const wl = await res.json();
-        const { win, lose } = wl;
+        const {
+            win,
+            lose
+        } = wl;
         let output = `${name} has won ${win} matches and has lost ${lose} matches for a Win % of ${(win / (win + lose) * 100).toFixed(2)}.`;
         console.log(output);
         message.channel.send(output);
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
 
     }
@@ -222,18 +237,38 @@ const _playerBattle = async (message, playerA, playerB, nameA, nameB) => {
         mmrB = await mmrB.json()
         mmrB = mmrB['mmr_estimate']['estimate'];
         let tA = await fetch(urlA + '/wl');
-        let { win: wA, lose: lA } = await tA.json();
+        let {
+            win: wA,
+            lose: lA
+        } = await tA.json();
         let tB = await fetch(urlB + '/wl')
-        let { win: wB, lose: lB } = await tB.json();
+        let {
+            win: wB,
+            lose: lB
+        } = await tB.json();
         let recents = await fetch(urlA + '/recentMatches')
         recents = await recents.json();
-        let statsA = { kills: 0, deaths: 0, assists: 0, mmr: mmrA, wins: wA, losses: lA };
+        let statsA = {
+            kills: 0,
+            deaths: 0,
+            assists: 0,
+            mmr: mmrA,
+            wins: wA,
+            losses: lA
+        };
         recents.forEach(match => {
             statsA.kills += match['kills'];
             statsA.deaths += match['deaths'];
             statsA.assists += match['assists'];
         });
-        let statsB = { kills: 0, deaths: 0, assists: 0, mmr: mmrB, wins: wB, losses: lB };
+        let statsB = {
+            kills: 0,
+            deaths: 0,
+            assists: 0,
+            mmr: mmrB,
+            wins: wB,
+            losses: lB
+        };
         recents = await fetch(urlB + '/recentMatches')
         recents = await recents.json();
         recents.forEach(match => {
@@ -250,21 +285,17 @@ const _playerBattle = async (message, playerA, playerB, nameA, nameB) => {
                 if (stat == 'deaths' || stat == 'losses') {
                     output += `${nameB} has less ${stat} than ${nameA} with ${statsB[stat]}: ${nameB}\n`;
                     sB++;
-                }
-                else {
+                } else {
                     output += `${nameA} has more ${stat} than ${nameB} with ${statsA[stat]}: ${nameA}\n`;
                     sA++;
                 }
-            }
-            else if (s == 0) {
+            } else if (s == 0) {
                 output += `${nameA} and ${nameB} have the same ${stat}: DRAW\n`;
-            }
-            else {
+            } else {
                 if (stat == 'deaths' || stat == 'losses') {
                     output += `${nameA} has less ${stat} than ${nameB} with ${statsA[stat]}: ${nameA}\n`;
                     sA++;
-                }
-                else {
+                } else {
                     output += `${nameB} has more ${stat} than ${nameA} with ${statsB[stat]}: ${nameB}\n`;
                     sB++;
                 }
@@ -277,8 +308,7 @@ const _playerBattle = async (message, playerA, playerB, nameA, nameB) => {
         else
             output += `It's a draw!`;
         message.channel.send(output);
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
 
     }
@@ -313,32 +343,38 @@ const _playerBattle = async (message, playerA, playerB, nameA, nameB) => {
 
 const _setUserProfile = async (player, name, userID, message) => {
     try {
-        db.find({ DiscordID: player }, (error, players) => {
+        db.find({
+            DiscordID: player
+        }, (error, players) => {
             if (error)
                 console.log(error);
             if (players.length > 0)
                 return message.reply("The user profile already exists!");
             else {
-                db.insert({ Name: name, DiscordID: player, Dota2: userID });
+                db.insert({
+                    Name: name,
+                    DiscordID: player,
+                    Dota2: userID
+                });
                 return message.reply('Your user profile has been set');
             }
         });
-    }
-    catch (err) {
+    } catch (err) {
         console.error(err);
     }
 };
 
 const _removeUserProfile = async (message, user) => {
     try {
-        db.remove({ DiscordID: user }, (error, numRemoved) => {
+        db.remove({
+            DiscordID: user
+        }, (error, numRemoved) => {
             if (error)
                 console.log(error);
             else
                 message.reply(", your profile has been successfully deleted!")
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 };
