@@ -30,36 +30,72 @@ db.on('error', () => {
     console.log("Error communicating with the database.");
 });
 
-mongoose.connect(dbUrl, (err) =>{
-    if(err)
+mongoose.connect(dbUrl, (err) => {
+    if (err)
         return console.log("Error connecting to the database.");
-    console.log("Connected!"); //remove later
+    console.log("Connected to the database."); //remove later
 });
 
 exports.addPlayer = (name, discordID, dotaID) => {
-    Player.create({name: name, discordID: discordID, dotaID: dotaID}, (err, result) => {
-        if(err)
+    Player.create({
+        name: name,
+        discordID: discordID,
+        dotaID: dotaID
+    }, (err, result) => {
+        if (err)
             return console.log("Player creation failed!");
         console.log(result);
     });
 }
 
 exports.searchPlayer = (record, callback) => {
-    if(record['name'] != undefined){
-        _searchPlayer({name: record['name']}, callback);
-    }
-    else if(record['dotaID'] != undefined)
-        _searchPlayer({dotaID: record['dotaID']}, callback);
-    else if(record['discordID'] != undefined)
-        _searchPlayer({discordID: record['discordID']}, callback);
+    _dataOverloader(record, _searchPlayer, callback);
+}
+
+exports.removePlayer = (record, callback) => {
+    _dataOverloader(record, _removePlayer, callback);
+}
+
+//Helper functions
+
+_dataOverloader = (record, helper, callback) => {
+    if (record['name'] != undefined) {
+        helper({
+            name: record['name']
+        }, callback);
+    } else if (record['dotaID'] != undefined)
+        helper({
+            dotaID: record['dotaID']
+        }, callback);
+    else if (record['discordID'] != undefined)
+        helper({
+            discordID: record['discordID']
+        }, callback);
     else
         return 'error';
 }
 
 _searchPlayer = (field, callback) => {
-    Player.find(field, (error, result) => {
-        if(error)
+    Player.findOne(field, (error, result) => {
+        if (error)
             return 'error';
+        else if (result === null)
+            return 'Record doesn\'t exist.';
+        else {
+            let player = {
+                name: result['name'],
+                dotaID: result['dotaID'],
+                discordID: result['discordID']
+            };
+            callback(player);
+        }
+    });
+}
+
+_removePlayer = (field, callback) => {
+    Player.deleteOne(field, (error, result) => {
+        if (error)
+            return 'Player doesn\'t exist';
         else
             callback(result);
     });
