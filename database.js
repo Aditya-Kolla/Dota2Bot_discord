@@ -4,15 +4,18 @@ var Schema = mongoose.Schema;
 var PlayerSchema = new Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     discordID: {
         type: Number,
-        required: true
+        required: true,
+        unique: true
     },
     dotaID: {
         type: Number,
-        required: true
+        required: true,
+        unique: true
     },
     dateJoined: {
         type: Date,
