@@ -6,7 +6,6 @@ let db = new Database({
     autoload: true
 });
 
-
 const vars = require("../app_variables.json");
 
 var stats = {};

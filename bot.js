@@ -5,7 +5,6 @@ const Discord   = require('discord.js');
 // const axios     = require('axios');
 const client    = new Discord.Client();
 
-
 //CONFIG 
 const vars = require("./app_variables.json");
 
