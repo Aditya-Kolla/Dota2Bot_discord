@@ -1,6 +1,8 @@
 #Ignore Node_Modules
 node_modules/
-playerDB.js
-sample.js
+
+# The .env file
 .env
+
+# package-lock.json
 package-lock.json
