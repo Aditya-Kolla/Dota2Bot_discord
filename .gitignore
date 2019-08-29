@@ -2,5 +2,5 @@
 node_modules/
 playerDB.js
 sample.js
-rohantesting.js
 .env
+package-lock.json
