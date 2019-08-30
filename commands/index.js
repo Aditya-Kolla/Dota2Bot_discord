@@ -342,6 +342,8 @@ const _showWinLoss = async (name, url, message) => {
 
 const _setUserProfile = async (player, name, userID, message) => {
     try {
+        if(!name && !userID)
+            return message.reply("Incorrect format");
         db.find({
             DiscordID: player
         }, (error, players) => {
