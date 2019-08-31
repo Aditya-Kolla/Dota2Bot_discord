@@ -1,8 +1,16 @@
 const mongoose = require('mongoose');
 
 let UserSchema = new mongoose.Schema({
-    DiscordId: String,
-    OpenDotaId: String,
+    DiscordId: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    OpenDotaId: {
+        type: String,
+        required: true,
+        unique: true
+    },
     LastUpdate: Date
 });
 
