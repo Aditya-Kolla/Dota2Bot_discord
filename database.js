@@ -1,25 +1,31 @@
 const mongoose = require('mongoose');
 const User = require('./models/User');
 
-let connect = (dbUrl) => {
-    mongoose.connect(dbUrl, { useNewUrlParser: true });
-    let db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'database connection error:'));
+let logger = console.log;
+
+const attachLogger = (userLogger) => {
+    logger = userLogger;
 }
 
-let addPlayer = (discordId, openDotaId, callback) => {
+const connect = (dbUrl) => {
+    mongoose.connect(dbUrl, { useNewUrlParser: true });
+    let db = mongoose.connection;
+    db.once('open', () => logger(`Connected to the database.`));
+}
+
+const addPlayer = (discordId, openDotaId, callback) => {
     let player = new User({
         DiscordId: discordId,
         OpenDotaId: openDotaId
     });
-    console.log(player);
+    logger(`Player saved to database:${player}.`);
     player.save();
 }
 
-let getPlayer = (discordId, callback) => {
-    User.findOne({ DiscordId: discordId }, (err, result) => {
+const getPlayer = (discordId, callback, projection) => {
+    User.findOne({ DiscordId: discordId }, projection, (err, result) => {
         if (err) {
-            console.log(err);
+            logger(err);
         } else {
             callback(result);
         }
@@ -27,6 +33,7 @@ let getPlayer = (discordId, callback) => {
 }
 
 module.exports = {
+    attachLogger: attachLogger,
     connect: connect,
     addPlayer: addPlayer,
     getPlayer: getPlayer
