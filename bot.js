@@ -1,9 +1,11 @@
 //BOT REQUIRES
 require('dotenv').config()
-const Discord   = require('discord.js');
-    // fetch = require('node-fetch');
-// const axios     = require('axios');
-const client    = new Discord.Client();
+const Discord = require('discord.js');
+const client = new Discord.Client();
+
+// Database connection.
+const db = require('./database');
+db.connect(process.env.dbUrl);
 
 //CONFIG 
 const vars = require("./app_variables.json");
@@ -32,7 +34,7 @@ client.on('message', message => {
             case "remove":
                 stats.removeUserProfile(message);
                 break;
-                
+
             case "ping":
                 message.reply("PONG");
                 break;
@@ -60,14 +62,14 @@ client.on('message', message => {
             case "WL":
                 stats.showWinLoss(message);
                 break;
-            
+
             case "1v1":
                 message.reply("Hold on there fella, still work in progress.");
                 break;
 
             case "help":
                 help.show(message);
-                break;    
+                break;
 
             default: message.reply("What are you trying to do?");
         }
