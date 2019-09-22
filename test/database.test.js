@@ -9,10 +9,17 @@ const mongoose = require('mongoose');
 // If this fails, they rest of the tests would fail anyway.
 db.connect(dbUrl);
 
-describe("Testing database operations.", () => {
+describe("Testing database operations.", function () {
+    this.timeout(5000);
+
+    after((done) => {
+        mongoose.disconnect(() => {
+            done();
+        });
+    });
 
     beforeEach((done) => {
-        mongoose.connection.collection("users").drop(() => {
+        mongoose.connection.collection("users").drop((any) => {
             done();
         });
     });
@@ -22,7 +29,7 @@ describe("Testing database operations.", () => {
             assert(testPlayer.DiscordId === "ADD_ID");
             done();
         });
-    })
+    });
 
     it("Retrieving a user with the DiscordId: FIND_ID", (done) => {
         db.addPlayer("FIND_ID", "TEST_ID").then(() => {
@@ -56,10 +63,4 @@ describe("Testing database operations.", () => {
         });
     });
 
-});
-
-process.on('SIGINT', () => {
-    mongoose.connection.collection("users").drop().then(() => {
-        mongoose.connection.close();
-    });
 });
