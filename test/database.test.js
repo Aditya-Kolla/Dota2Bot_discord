@@ -6,20 +6,23 @@ const dbUrl = 'mongodb://localhost/testdb';
 // Necessary import to do collection cleanup.
 const mongoose = require('mongoose');
 
-// If this fails, they rest of the tests would fail anyway.
-db.connect(dbUrl);
 
 describe("Testing database operations.", function () {
     this.timeout(5000);
 
+    before(() => {
+        // If this fails, they rest of the tests would fail anyway.
+        return db.connect(dbUrl);
+    });
+    
     after((done) => {
-        mongoose.disconnect(() => {
+        return mongoose.disconnect(() => {
             done();
         });
     });
 
     beforeEach((done) => {
-        mongoose.connection.collection("users").drop((any) => {
+        return mongoose.connection.collection("users").drop((any) => {
             done();
         });
     });
