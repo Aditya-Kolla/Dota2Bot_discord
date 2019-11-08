@@ -18,6 +18,7 @@ const help = require('./help/index');
 
 client.on("ready", _ => {
     console.log(`Logged in as ${client.user.tag}!`);
+    client.channels.get('499131225835962382').send('Did you miss me?');
 });
 
 client.on('message', message => {

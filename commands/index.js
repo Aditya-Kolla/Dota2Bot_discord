@@ -127,7 +127,6 @@ stats.removeUserProfile = async (message) => {
 const _getMedal = async (name, url, message) => {
     try {
         const json = await axios(url);
-        // console.log(json);
         let rank = json["data"]["rank_tier"];
         let medal = vars.medals[Math.floor(rank / 10) - 1] + " (" + rank % 10 + ")";
         let output = name + " : " + medal;
@@ -170,6 +169,8 @@ const _showWinLoss = async (name, url, message) => {
 
 const _setUserProfile = async (player, name, userID, message) => {
     try {
+        if(!name && !userID)
+            return message.reply("Incorrect format");
         db.find({
             DiscordID: player
         }, (error, players) => {
